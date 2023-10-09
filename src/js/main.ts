@@ -6,10 +6,13 @@ import AudioBars from './objects/AudioBars.js';
 import AudioAnalyzer from './AudioAnalyzer.js';
 import FrequencyBand from './FrequencyBand.js';
 import RythmicCircle from './objects/RythmicCircle.js';
+import FrequencyStack from './FrequencyStack.js';
 
 //Audio 
 let audio = new Audio();
 audio.volume = 1;
+
+let audioAnalyzer: AudioAnalyzer;
 
 const file: any = document.getElementById("file-upload");
 file?.addEventListener("change", () => {
@@ -19,62 +22,62 @@ file?.addEventListener("change", () => {
 
   audio.volume = 0.5;
 
+  audioAnalyzer = new AudioAnalyzer(audio, new window.AudioContext());
 
-  let frequencyBands = [
-    new FrequencyBand(0, 86),
-    new FrequencyBand(87, 172),
-    new FrequencyBand(173, 344),
-    new FrequencyBand(345, 688),
-    new FrequencyBand(689, 1376),
-    new FrequencyBand(1377, 2752),
-    new FrequencyBand(2753, 5504),
-    new FrequencyBand(5505, 11008),
-  ]
+  let audioBarsStack = new FrequencyStack(
+    [
+      new FrequencyBand(2753, 5504),
+      new FrequencyBand(10, 86),
+      new FrequencyBand(60, 250),     // Bass
+      new FrequencyBand(345, 400),
+      new FrequencyBand(2000, 4000),  // Upper Midrange
+      new FrequencyBand(689, 1376),
+      new FrequencyBand(250, 500),    // Low Midrange
+      new FrequencyBand(1277, 2752),
+      new FrequencyBand(87, 172),
+      new FrequencyBand(127, 344),
+      new FrequencyBand(4000, 8000),  // Presence
+      new FrequencyBand(5505, 11008),
+      new FrequencyBand(500, 2000),   // Midrange
+    ]
+  )
 
-  initAudioBars();
-  initMusicCircle(frequencyBands);
-})
+  let generalStack = new FrequencyStack(
+    [
+      new FrequencyBand(0, 86),
+      new FrequencyBand(87, 172),
+      new FrequencyBand(173, 344),
+      new FrequencyBand(345, 688),
+      new FrequencyBand(689, 1376),
+      new FrequencyBand(1377, 2752),
+      new FrequencyBand(2753, 5504),
+      new FrequencyBand(5505, 11008),
+    ]
+  );
 
-function initAudioBars() {
-  const audioContext = new window.AudioContext();
-
-  let audioBars: AudioBars;
-
-  let audioAnalyzer: AudioAnalyzer
-
-  // AudioBars frequency bands
-  const frequencyBands: FrequencyBand[] = [
-    new FrequencyBand(2753, 5504),
-    new FrequencyBand(10, 86),
-    new FrequencyBand(60, 250),     // Bass
-    new FrequencyBand(345, 400),
-    new FrequencyBand(2000, 4000),  // Upper Midrange
-    new FrequencyBand(689, 1376),
-    new FrequencyBand(250, 500),    // Low Midrange
-    new FrequencyBand(1277, 2752),
-    new FrequencyBand(87, 172),
-    new FrequencyBand(127, 344),
-    new FrequencyBand(4000, 8000),  // Presence
-    new FrequencyBand(5505, 11008),
-    new FrequencyBand(500, 2000),   // Midrange
-  ]
-  audioAnalyzer = new AudioAnalyzer(audio, audioContext, frequencyBands, true);
-  let barsWidth = innerWidth / 2170.64 * 40;
-  let audioBarsSize = (barsWidth * frequencyBands.length * 2);
-  audioBars = new AudioBars(innerWidth - audioBarsSize - 10, innerHeight / 2, barsWidth, audioAnalyzer);
+  audioAnalyzer.addStack(generalStack);
+  audioAnalyzer.addStack(audioBarsStack);
 
   SceneManager.instance?.activeScene?.addObject(audioAnalyzer);
+
+  initAudioBars(audioBarsStack);
+  initMusicCircle(generalStack);
+})
+
+function initAudioBars(frequencyStack: FrequencyStack) {
+  let barsWidth = innerWidth / 2170.64 * 40;
+  let audioBarsSize = (barsWidth * frequencyStack.getSize() * 2);
+
+  let audioBars = new AudioBars(innerWidth - audioBarsSize - 10, innerHeight / 2, barsWidth, frequencyStack);
+
 
   SceneManager.instance?.activeScene?.addObject(audioBars);
 }
-function initMusicCircle(frequencyBands: FrequencyBand[]) {
-  const audioContext = new window.AudioContext();
-
-  let audioAnalyzer = new AudioAnalyzer(audio, audioContext, frequencyBands, false);
-
-  let musicCircle = new RythmicCircle(100, innerHeight / 2, 50, "../img/cat.png");
-
-  SceneManager.instance?.activeScene?.addObject(audioAnalyzer);
+function initMusicCircle(frequencyStack: FrequencyStack) {
+  const image = new Image();
+  image.src = "./cat.PNG";
+  
+  let musicCircle = new RythmicCircle(innerWidth / 2170.64 * 500, innerHeight / 2, 50, image, frequencyStack);
 
   SceneManager.instance?.activeScene?.addObject(musicCircle);
 }
