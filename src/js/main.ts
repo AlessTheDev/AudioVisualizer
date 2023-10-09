@@ -50,7 +50,6 @@ const generalStack = new FrequencyStack(
 //Events
 document.getElementsByClassName("controls-hide-button")[0].addEventListener("click", (e) => toggleControls(e));
 
-audioAnalyzer = new AudioAnalyzer(audio, new window.AudioContext());
 
 const file: any = document.getElementById("file-upload");
 file?.addEventListener("change", () => {
@@ -59,6 +58,11 @@ file?.addEventListener("change", () => {
   audio.play();
 
   audio.volume = 0.5;
+
+  if (!audioAnalyzer) {
+    audioAnalyzer = new AudioAnalyzer(audio, new window.AudioContext());
+
+  }
 
 
   audioAnalyzer.addStack(generalStack);
