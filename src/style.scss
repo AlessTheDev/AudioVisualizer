@@ -10,7 +10,7 @@ body {
     background-position: center;
 }
 
-.dark-overlay{
+.dark-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -18,10 +18,52 @@ body {
     height: 100%;
     background-color: black;
     opacity: 0.8;
-    z-index: -10
+    z-index: -10;
 }
 
-.controls{
+.controls {
     position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: #544e6393;
+    color: white;
+    border-radius: 20px;
+
+    .content {
+        display: flex;
+        align-items: center;
+        margin-left: 10px;
+
+        input[type="file"]::file-selector-button {
+            border: none;
+            background-color: #ffffff;
+            border-radius: 3px;
+        }
+        button {
+            border: none;
+            background-color: #ffffff;
+            padding: 5px;
+            border-radius: 3px;
+            margin-left: 10px;
+        }
+
+        
+    }
+}
+.hidden:not(.hide-button){
+    display: none;
+}
+.hidden{
+    opacity: 0.3;
+}
+.hide-button {
+    width: 30px;
+    background: none;
+    border: none;
+}
+.hide-button img {
+    width: 100%;
 }
 

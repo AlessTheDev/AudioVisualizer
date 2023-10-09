@@ -12,9 +12,13 @@
 <body>
   <div id="app">
     <div class="controls">
-      <input type="file" id="file-upload" accept="audio/*">
-      <button id="play">PLAY</button>
-      <button id="pause">PAUSE</button>
+      <button class="hide-button controls-hide-button"><img src="./hide-icon.png"></button>
+      <div class="content controls-content">
+        <input type="file" id="file-upload" accept="audio/*">
+        <button id="play">PLAY</button>
+        <button id="pause">PAUSE</button>
+      </div>
+
     </div>
     <div class="dark-overlay"></div>
     <div style="display: flex; justify-content: center; align-items: center;">

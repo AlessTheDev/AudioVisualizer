@@ -5,9 +5,12 @@ import SceneManager from "./SceneManager";
 import SimpleGameObject from "./SimpleGameObject";
 
 export default class AudioBars extends SimpleGameObject {
-    private barsHeight: number[] = [];
-    private barWidth: number;
+    barsHeight: number[] = [];
+    barWidth: number;
+
     private frequencyStack: FrequencyStack;
+
+    onResize: Function = (obj: AudioBars) => {};
 
     constructor(x: number, y: number, barWidth: number, frequencyStack: FrequencyStack) {
         super(x, y, "transparent");
@@ -15,6 +18,8 @@ export default class AudioBars extends SimpleGameObject {
         this.barWidth = barWidth;
 
         this.frequencyStack = frequencyStack;
+
+        addEventListener("resize", () => {this.onResize(this);});
     }
 
     draw() {
@@ -22,7 +27,7 @@ export default class AudioBars extends SimpleGameObject {
 
 
         for (let i = 0; i <= this.frequencyStack.getSize(); i++) {
-            context!.fillStyle = utils.interpolateColor("#f5e0df", "#ed6a66", this.frequencyStack.getRangedFrequencyBand(i) * 100);
+            context!.fillStyle = utils.interpolateColor("#B9B4C7", "#FAF0E6", this.frequencyStack.getRangedFrequencyBand(i) * 100);
             context?.fillRect(this.x + (this.barWidth * i) + (i * this.barWidth), this.y - this.barsHeight[i] / 2, this.barWidth, this.barsHeight[i]);
         }
     }

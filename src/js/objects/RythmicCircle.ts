@@ -8,6 +8,8 @@ export default class RythmicCircle extends GameObject {
     private frequencyStack: FrequencyStack;
     private baseSize: number;
 
+    onResize: Function = (obj: RythmicCircle) => {};
+
     constructor(x: number, y: number, size: number, image: HTMLImageElement, frequencyStack: FrequencyStack) {
         super(x, y, size, "transparent");
         this.baseSize = size;
@@ -17,6 +19,8 @@ export default class RythmicCircle extends GameObject {
         this.image = image;
 
         this.frequencyStack = frequencyStack;
+
+        addEventListener("resize", this.onResize(this));
     }
     draw() {
         const c = SceneManager.instance?.activeScene?.c;

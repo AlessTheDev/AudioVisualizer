@@ -14,6 +14,8 @@ export default class Scene {
     private animationFrameId: number = 0;
 
     private objectsToRemoveQueue: Object[] = []; 
+
+    onResize: Function = (s: Scene) => {};
     
     constructor(width: number, height: number, initFunction: Function) {
         //Canvas Info
@@ -28,7 +30,7 @@ export default class Scene {
         new Time();
 
         this.initFunction = initFunction;
-
+        addEventListener("resize", () => {this.onResize(this)});
     }
 
     // Animation Loop

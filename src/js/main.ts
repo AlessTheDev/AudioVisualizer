@@ -14,6 +14,44 @@ audio.volume = 1;
 
 let audioAnalyzer: AudioAnalyzer;
 
+let isInitialized = false;
+
+const audioBarsStack = new FrequencyStack(
+  [
+    new FrequencyBand(2753, 5504),
+    new FrequencyBand(10, 86),
+    new FrequencyBand(60, 250),     // Bass
+    new FrequencyBand(345, 400),
+    new FrequencyBand(2000, 4000),  // Upper Midrange
+    new FrequencyBand(689, 1376),
+    new FrequencyBand(250, 500),    // Low Midrange
+    new FrequencyBand(1277, 2752),
+    new FrequencyBand(87, 172),
+    new FrequencyBand(127, 344),
+    new FrequencyBand(4000, 8000),  // Presence
+    new FrequencyBand(5505, 11008),
+    new FrequencyBand(500, 2000),   // Midrange
+  ]
+)
+
+const generalStack = new FrequencyStack(
+  [
+    new FrequencyBand(0, 86),
+    new FrequencyBand(87, 172),
+    new FrequencyBand(173, 344),
+    new FrequencyBand(345, 688),
+    new FrequencyBand(689, 1376),
+    new FrequencyBand(1377, 2752),
+    new FrequencyBand(2753, 5504),
+    new FrequencyBand(5505, 11008),
+  ]
+);
+
+//Events
+document.getElementsByClassName("controls-hide-button")[0].addEventListener("click", (e) => toggleControls(e));
+
+audioAnalyzer = new AudioAnalyzer(audio, new window.AudioContext());
+
 const file: any = document.getElementById("file-upload");
 file?.addEventListener("change", () => {
   audio.src = URL.createObjectURL(file.files[0]);
@@ -22,61 +60,38 @@ file?.addEventListener("change", () => {
 
   audio.volume = 0.5;
 
-  audioAnalyzer = new AudioAnalyzer(audio, new window.AudioContext());
-
-  let audioBarsStack = new FrequencyStack(
-    [
-      new FrequencyBand(2753, 5504),
-      new FrequencyBand(10, 86),
-      new FrequencyBand(60, 250),     // Bass
-      new FrequencyBand(345, 400),
-      new FrequencyBand(2000, 4000),  // Upper Midrange
-      new FrequencyBand(689, 1376),
-      new FrequencyBand(250, 500),    // Low Midrange
-      new FrequencyBand(1277, 2752),
-      new FrequencyBand(87, 172),
-      new FrequencyBand(127, 344),
-      new FrequencyBand(4000, 8000),  // Presence
-      new FrequencyBand(5505, 11008),
-      new FrequencyBand(500, 2000),   // Midrange
-    ]
-  )
-
-  let generalStack = new FrequencyStack(
-    [
-      new FrequencyBand(0, 86),
-      new FrequencyBand(87, 172),
-      new FrequencyBand(173, 344),
-      new FrequencyBand(345, 688),
-      new FrequencyBand(689, 1376),
-      new FrequencyBand(1377, 2752),
-      new FrequencyBand(2753, 5504),
-      new FrequencyBand(5505, 11008),
-    ]
-  );
 
   audioAnalyzer.addStack(generalStack);
   audioAnalyzer.addStack(audioBarsStack);
 
-  SceneManager.instance?.activeScene?.addObject(audioAnalyzer);
-
   initAudioBars(audioBarsStack);
   initMusicCircle(generalStack);
+
+  SceneManager.instance?.activeScene?.addObject(audioAnalyzer);
 })
 
 function initAudioBars(frequencyStack: FrequencyStack) {
-  let barsWidth = innerWidth / 2170.64 * 40;
+  let canvas = SceneManager.instance?.activeScene?.canvas;
+
+  let barsWidth = canvas?.width! / 2170.64 * 40;
   let audioBarsSize = (barsWidth * frequencyStack.getSize() * 2);
 
-  let audioBars = new AudioBars(innerWidth - audioBarsSize - 10, innerHeight / 2, barsWidth, frequencyStack);
+  let audioBars = new AudioBars(canvas?.width! - audioBarsSize - 10, canvas?.height! / 2, barsWidth, frequencyStack);
 
+  audioBars.onResize = (obj: AudioBars) => {
+    let barsWidth = canvas?.width! / 2170.64 * 40;
+    let audioBarsSize = (barsWidth * frequencyStack.getSize() * 2);
+    obj.x = canvas?.width! - audioBarsSize - 10;
+    obj.y = canvas?.height! / 2;
+    obj.barWidth = barsWidth;
+  }
 
   SceneManager.instance?.activeScene?.addObject(audioBars);
 }
 function initMusicCircle(frequencyStack: FrequencyStack) {
   const image = new Image();
   image.src = "./cat.PNG";
-  
+
   let musicCircle = new RythmicCircle(innerWidth / 2170.64 * 500, innerHeight / 2, 50, image, frequencyStack);
 
   SceneManager.instance?.activeScene?.addObject(musicCircle);
@@ -116,8 +131,25 @@ document.getElementById("play")?.addEventListener('click', () => {
   audio.play();
 })
 
+
 //Initialize the scene 
 function start(scene: Scene) {
+  scene.onResize = (s: Scene) => {
+    s.canvas!.width = window.innerWidth - 10;
+    s.canvas!.height = window.innerHeight - 10;
+  }
+}
+
+function toggleControls(e: Event) {
+  let controls = document.getElementsByClassName('controls-content')[0];
+  let hideButton = document.getElementsByClassName('controls-hide-button')[0];
+  if (controls.classList.contains("hidden")) {
+    controls.classList.remove("hidden");
+    hideButton.classList.remove("hidden");
+  } else {
+    controls.classList.add("hidden");
+    hideButton.classList.add("hidden");
+  }
 }
 
 
