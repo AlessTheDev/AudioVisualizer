@@ -7,6 +7,7 @@ import AudioAnalyzer from './AudioAnalyzer.js';
 import FrequencyBand from './FrequencyBand.js';
 import RythmicCircle from './objects/RythmicCircle.js';
 import FrequencyStack from './FrequencyStack.js';
+import ParticleGenerator from './objects/ParticleGenerator.js';
 
 //Audio 
 let audio = new Audio();
@@ -70,6 +71,7 @@ file?.addEventListener("change", () => {
 
   initAudioBars(audioBarsStack);
   initMusicCircle(generalStack);
+  initParticlesGenerator(generalStack);
 
   SceneManager.instance?.activeScene?.addObject(audioAnalyzer);
 })
@@ -96,9 +98,14 @@ function initMusicCircle(frequencyStack: FrequencyStack) {
   const image = new Image();
   image.src = "./cat.PNG";
 
-  let musicCircle = new RythmicCircle(innerWidth / 2170.64 * 500, innerHeight / 2, 50, image, frequencyStack);
+  let canvas = SceneManager.instance?.activeScene?.canvas;
+
+  let musicCircle = new RythmicCircle(canvas?.width! / 2170.64 * 500, canvas?.height! / 2, 50, image, frequencyStack);
 
   SceneManager.instance?.activeScene?.addObject(musicCircle);
+}
+function initParticlesGenerator(frequencyStack: FrequencyStack) {
+  SceneManager.instance?.activeScene?.addObject(new ParticleGenerator(frequencyStack));
 }
 
 //Scene manager initialization
